@@ -1,1 +1,1 @@
-# article-group-package-python-sdk
+# Article Group Package File Python SDK
