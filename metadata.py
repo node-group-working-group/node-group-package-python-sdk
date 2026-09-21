@@ -1,3 +1,9 @@
+class Contributor:
+    def __init__(self, name, contribution):
+        self.name = name
+        self.contribution = contribution
+
+
 class Metadata:
     def __init__(
         self,
@@ -22,9 +28,3 @@ class Metadata:
         self.language = language
         self.license = license
         self.version = version
-
-
-class Contributor:
-    def __init__(self, name, contribution):
-        self.name = name
-        self.contribution = contribution

@@ -1,50 +1,63 @@
-def create_node():
+from .sql import SqliteDatabase
+
+from .constants import ASSETS_DIRECTORY, INDEX_FILE
+
+
+def initialize(path):
     pass
 
 
-def delete_node_by_id():
+def insert_node(path):
     pass
 
 
-def get_all_nodes():
+def delete_node_by_id(path):
     pass
 
 
-def get_node_by_id(id):
+def get_all_nodes(path):
     pass
 
 
-def get_nodes_by_url(url):
+def get_node_by_id(path, id):
     pass
 
 
-def update_node_by_id():
+def get_nodes_by_url_match(path, url_match):
     pass
 
 
-def create_edge():
+def set_node_by_id(path, id, node):
     pass
 
 
-def delete_edge_by_id():
+def upload_file_in_node_id(path, id, file):
     pass
 
 
-def get_all_edges():
+def insert_edge(path):
     pass
 
 
-def get_edges_by_edge_type_name(edge_type_name):
+def delete_edge_by_id(path, id):
     pass
 
 
-def get_edge_by_id(id):
+def get_all_edges(path):
     pass
 
 
-def get_edges_by_node_id(node_id):
+def get_edges_by_edge_type_name(path, edge_type_name):
     pass
 
 
-def update_edge_by_id():
+def get_edge_by_id(path, id):
+    pass
+
+
+def get_edges_by_node_id(path, node_id):
+    pass
+
+
+def set_edge_by_id(path, id, edge):
     pass
