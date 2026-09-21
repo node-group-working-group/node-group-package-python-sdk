@@ -1,4 +1,8 @@
-def execute():
+import argparse
+import shlex
+
+
+def execute(parser, command):
     pass
 
 
@@ -14,7 +18,7 @@ def shell():
 
 def run(args):
     if args.shell:
-        execute(args.shell)
+        execute(shlex.split(args.shell))
         return
 
     shell()
