@@ -4,7 +4,7 @@ import shutil
 import tarfile
 import tempfile
 
-from .constants import METADATA_FILE
+from .constants import ASSETS_DIRECTORY, INDEX_FILE, METADATA_FILE
 from compression import zstd
 from .metadata import Contributor, Metadata
 

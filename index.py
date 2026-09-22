@@ -1,7 +1,5 @@
 from .sql import SqliteDatabase
 
-from .constants import ASSETS_DIRECTORY, INDEX_FILE
-
 
 def initialize(path):
     pass
@@ -28,10 +26,6 @@ def get_nodes_by_url_match(path, url_match):
 
 
 def set_node_by_id(path, id, node):
-    pass
-
-
-def upload_file_in_node_id(path, id, file):
     pass
 
 
