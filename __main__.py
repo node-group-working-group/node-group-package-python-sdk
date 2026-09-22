@@ -1,6 +1,15 @@
 import argparse
 
-from core import run
+from shell import execute, shell
+
+
+def run(args):
+    if args.shell:
+        execute(args.shell)
+        return
+
+    shell()
+
 
 if __name__ == "__main__":
     sys_parser = argparse.ArgumentParser(exit_on_error=False)

@@ -1,11 +1,21 @@
 import argparse
 import shlex
 
+from .file import File
+
+current_file = File()
 parser = argparse.ArgumentParser(exit_on_error=False)
 
 shell_parsers = parser.add_subparsers(dest="command", required=True)
 
 quit_parser = shell_parsers.add_parser("quit")
+
+open_parser = shell_parsers.add_parser("open")
+open_parser.add_argument("-f, --force", action="store_true")
+open_parser.add_argument("path", type=str)
+
+commit_parser = shell_parsers.add_parser("commit")
+commit_parser.add_argument("path", default=None, type=str)
 
 insert_node_parser = shell_parsers.add_parser("insert-node")
 insert_node_parser.add_argument("type", default="article", type=str)
@@ -14,44 +24,46 @@ insert_node_parser.add_argument("url", type=str)
 create_node_type_parser = shell_parsers.add_parser("create-node-type")
 create_node_type_parser.add_argument("name", type=str)
 
-insert_relationship_parser = shell_parsers.add_parser("insert-relationship")
-insert_relationship_parser.add_argument("source-node-id", type=int)
-insert_relationship_parser.add_argument("type", type=str)
-insert_relationship_parser.add_argument("target-node-id", type=int)
+insert_edge_parser = shell_parsers.add_parser("insert-edge")
+insert_edge_parser.add_argument("source-node-id", type=int)
+insert_edge_parser.add_argument("type", type=str)
+insert_edge_parser.add_argument("target-node-id", type=int)
 
-create_relationship_type_parser = shell_parsers.add_parser(
-    "create-relationship-type"
-)
-create_relationship_type_parser.add_argument("name", type=str)
+create_edge_type_parser = shell_parsers.add_parser("create-relationship-type")
+create_edge_type_parser.add_argument("name", type=str)
 
 delete_parser = shell_parsers.add_parser("delete")
 delete_parser.add_argument(
     "entity", choices=["edge", "edge_type", "node", "node_type"], type=str
 )
-delete_parser.add_argument("id", type=int)
+delete_parser.add_argument("id", type=str)
 
 get_all_parser = shell_parsers.add_parser("get-all")
 get_all_parser.add_argument(
     "entity", choices=["edge", "edge_type", "node", "node_type"], type=str
 )
+get_all_parser.add_argument("type", type=str)
+
 
 get_parser = shell_parsers.add_parser("get")
 get_parser.add_argument(
     "entity", choices=["edge", "edge_type", "node", "node_type"], type=str
 )
-get_parser.add_argument("id", type=int)
+get_parser.add_argument("id", type=str)
 
-get_node_asset_folder_parser = shell_parsers.add_parser("get-node-asset-folder")
-get_node_asset_folder_parser.add_argument("id", type=int)
-
-open_node_asset_folder_parser = shell_parsers.add_parser(
-    "open-node-asset-folder"
+get_node_asset_directory_parser = shell_parsers.add_parser(
+    "get-node-asset-directory"
 )
-open_node_asset_folder_parser.add_argument("id", type=int)
+get_node_asset_directory_parser.add_argument("id", type=int)
+
+open_node_asset_directory_parser = shell_parsers.add_parser(
+    "open-node-asset-directory"
+)
+open_node_asset_directory_parser.add_argument("id", type=int)
 
 upload_node_asset_parser = shell_parsers.add_parser("upload-node-asset")
 upload_node_asset_parser.add_argument("id", type=int)
-upload_node_asset_parser.add_argument("file", type=int)
+upload_node_asset_parser.add_argument("asset", type=int)
 
 match_node_parser = shell_parsers.add_parser("match-node")
 match_node_parser.add_argument("match", type=str)
@@ -69,7 +81,7 @@ update_node_type_parser = shell_parsers.add_parser("update-node-type")
 update_node_type_parser.add_argument("--name", type=str)
 update_node_type_parser.add_argument("--scheme", type=str)
 update_node_type_parser.add_argument("--scheme-font", type=str)
-update_node_type_parser.add_argument("name", type=str)
+update_node_type_parser.add_argument("current-name", type=str)
 
 set_node_type_scheme_parser = shell_parsers.add_parser("set-node-type-scheme")
 set_node_type_scheme_parser.add_argument("name", type=str)
@@ -95,19 +107,28 @@ def execute(command):
         return
 
     try:
-        args = parser.parse_args(shlex.split(command))
-    except (argparse.ArgumentError, SystemExit) as exception:
+        args_list = shlex.split(command)
+    except ValueError as exception:
         print(exception)
         return
 
+    try:
+        args = parser.parse_args(args_list)
+    except (argparse.ArgumentError, SystemExit):
+        return
+
     match args.command:
+        case "open":
+            pass
+        case "commit":
+            pass
         case "insert-node":
             pass
         case "create-node-type":
             pass
-        case "insert-relationship":
+        case "insert-edge":
             pass
-        case "create-relationship-type":
+        case "create-edge-type":
             pass
         case "delete":
             pass
@@ -115,9 +136,9 @@ def execute(command):
             pass
         case "get":
             pass
-        case "get-node-asset-folder":
+        case "get-node-asset-directory":
             pass
-        case "open-node-asset-folder":
+        case "open-node-asset-directory":
             pass
         case "upload-node-asset":
             pass
@@ -129,6 +150,10 @@ def execute(command):
             pass
         case "update-node-type":
             pass
+        case "set-node-type-scheme":
+            pass
+        case "set-node-type-scheme-font":
+            pass
         case "set-edge":
             pass
         case "update-edge-type":
@@ -137,17 +162,14 @@ def execute(command):
 
 def shell():
     while True:
-        command = input("$ ").strip()
+        try:
+            command = input("$ ").strip()
 
-        if command in ["quit"]:
-            return
+            if command in ["quit"]:
+                break
 
-        execute(command)
-
-
-def run(args):
-    if args.shell:
-        execute(args.shell)
-        return
-
-    shell()
+            execute(command)
+        except KeyboardInterrupt:
+            break
+        except EOFError:
+            break
