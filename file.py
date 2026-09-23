@@ -116,8 +116,8 @@ class File:
     def get_edge_by_id(self, id):
         return index.get_edge_by_id(Path(self._folder) / INDEX_FILE, id)
 
-    def get_all_edges(self):
-        return index.get_all_edges(Path(self._folder) / INDEX_FILE)
+    def get_all_edges(self, _type):
+        return index.get_all_edges(Path(self._folder) / INDEX_FILE, _type)
 
     def get_edges_by_edge_type_name(self, edge_type_name):
         return index.get_edges_by_edge_type_name(
@@ -141,9 +141,11 @@ class File:
         pass
 
     def open_node_asset_directory(self, id):
+        # Should open with default explorer (open, xdg-open, etc.)
         pass
 
     def upload_node_asset(self, id, asset_path):
+        # Uploads a file to the asset folder of this node (id)
         pass
 
     def set_node_by_id(self, id, url=None, _type_name=None, content=None):
@@ -157,7 +159,11 @@ class File:
     ):
         if self.get_node_type_by_name(current_name):
             index.update_node_type_by_name(
-                current_name, name, scheme, scheme_font
+                Path(self._folder) / INDEX_FILE,
+                current_name,
+                name,
+                scheme,
+                scheme_font,
             )
 
     def set_edge_by_id(

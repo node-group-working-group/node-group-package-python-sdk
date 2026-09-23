@@ -13,8 +13,9 @@ class EdgeType:
 
 
 class Node:
-    def __init__(self, id, node_type_id, content):
+    def __init__(self, id, url, node_type_id, content):
         self.id = id
+        self.url = url
         self.node_type_id = node_type_id
         self.content = content
 

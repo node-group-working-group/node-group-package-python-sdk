@@ -11,7 +11,7 @@ shell_parsers = parser.add_subparsers(dest="command", required=True)
 quit_parser = shell_parsers.add_parser("quit")
 
 open_parser = shell_parsers.add_parser("open")
-open_parser.add_argument("-f, --force", action="store_true")
+open_parser.add_argument("-f", "--force", action="store_true")
 open_parser.add_argument("path", type=str)
 
 commit_parser = shell_parsers.add_parser("commit")
@@ -142,7 +142,7 @@ def execute(command):
             current_file.create_node_type(args.name)
         case "insert-edge":
             current_file.insert_edge(
-                args.source_node_id, args.type, args.target_node_id
+                args.source_node_id, args.target_node_id, args.type
             )
         case "create-edge-type":
             current_file.create_edge_type(args.name)
@@ -183,7 +183,7 @@ def execute(command):
         case "upload-node-asset":
             current_file.upload_node_asset(args.id, args.asset)
         case "match-node":
-            current_file.match_nodes_by_url(args.url)
+            current_file.match_nodes_by_url(args.match)
         case "set-node":
             current_file.set_node_by_id(
                 args.id, args.url, args.type, args.content
@@ -209,7 +209,7 @@ def execute(command):
                 args.id, args.source_node_id, args.type, args.target_node_id
             )
         case "update-edge-type":
-            current_file.update_edge_type(args.current_name, args.name)
+            current_file.update_edge_type(args.current_name, args.new_name)
 
 
 def shell():

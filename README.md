@@ -1,1 +1,1 @@
-# Article Group Package File Python SDK
+# Node Group Package File Python SDK

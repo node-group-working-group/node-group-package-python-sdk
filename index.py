@@ -59,7 +59,7 @@ def delete_edge_by_id(path, id):
     pass
 
 
-def get_all_edges(path):
+def get_all_edges(path, _type):
     pass
 
 
