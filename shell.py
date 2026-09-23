@@ -25,9 +25,13 @@ create_node_type_parser = shell_parsers.add_parser("create-node-type")
 create_node_type_parser.add_argument("name", type=str)
 
 insert_edge_parser = shell_parsers.add_parser("insert-edge")
-insert_edge_parser.add_argument("source-node-id", type=int)
+insert_edge_parser.add_argument(
+    "source-node-id", dest="source_node_id", type=int
+)
 insert_edge_parser.add_argument("type", type=str)
-insert_edge_parser.add_argument("target-node-id", type=int)
+insert_edge_parser.add_argument(
+    "target-node-id", dest="target_node_id", type=int
+)
 
 create_edge_type_parser = shell_parsers.add_parser("create-relationship-type")
 create_edge_type_parser.add_argument("name", type=str)
@@ -80,8 +84,12 @@ set_node_content_parser.add_argument("id", type=int)
 update_node_type_parser = shell_parsers.add_parser("update-node-type")
 update_node_type_parser.add_argument("--name", type=str)
 update_node_type_parser.add_argument("--scheme", type=str)
-update_node_type_parser.add_argument("--scheme-font", type=str)
-update_node_type_parser.add_argument("current-name", type=str)
+update_node_type_parser.add_argument(
+    "--scheme-font", dest="scheme_font", type=str
+)
+update_node_type_parser.add_argument(
+    "current-name", dest="current_name", type=str
+)
 
 set_node_type_scheme_parser = shell_parsers.add_parser("set-node-type-scheme")
 set_node_type_scheme_parser.add_argument("name", type=str)
@@ -93,13 +101,19 @@ set_node_type_scheme_font_parser.add_argument("name", type=str)
 
 set_edge_parser = shell_parsers.add_parser("set-edge")
 set_edge_parser.add_argument("--type", type=str)
-set_edge_parser.add_argument("--source-node-id", type=int)
-set_edge_parser.add_argument("--target-node-id", type=int)
+set_edge_parser.add_argument(
+    "--source-node-id", dest="source_node_id", type=int
+)
+set_edge_parser.add_argument(
+    "--target-node-id", dest="target_node_id", type=int
+)
 set_edge_parser.add_argument("id", type=int)
 
 update_edge_type_parser = shell_parsers.add_parser("update-edge-type")
-update_edge_type_parser.add_argument("current-name", type=str)
-update_edge_type_parser.add_argument("new-name", type=str)
+update_edge_type_parser.add_argument(
+    "current-name", dest="current_name", type=str
+)
+update_edge_type_parser.add_argument("new-name", dest="new_name", type=str)
 
 
 def execute(command):
@@ -119,45 +133,83 @@ def execute(command):
 
     match args.command:
         case "open":
-            pass
+            current_file.open(args.path, args.force)
         case "commit":
-            pass
+            current_file.commit(args.path)
         case "insert-node":
-            pass
+            current_file.insert_node(args.url, args.type)
         case "create-node-type":
-            pass
+            current_file.create_node_type(args.name)
         case "insert-edge":
-            pass
+            current_file.insert_edge(
+                args.source_node_id, args.type, args.target_node_id
+            )
         case "create-edge-type":
-            pass
+            current_file.create_edge_type(args.name)
         case "delete":
-            pass
+            match args.entity:
+                case "edge":
+                    current_file.delete_edge_by_id(args.id)
+                case "edge_type":
+                    current_file.delete_edge_type_by_name(args.id)
+                case "node":
+                    current_file.delete_node_by_id(args.id)
+                case "node_type":
+                    current_file.delete_node_type_by_name(args.id)
         case "get-all":
-            pass
+            match args.entity:
+                case "edge":
+                    current_file.get_all_edges(args.type)
+                case "edge_type":
+                    current_file.get_all_edge_types()
+                case "node":
+                    current_file.get_all_nodes(args.type)
+                case "node_type":
+                    current_file.get_all_node_types()
         case "get":
-            pass
+            match args.entity:
+                case "edge":
+                    current_file.get_edge_by_id(args.id)
+                case "edge_type":
+                    current_file.get_edge_type_by_name(args.id)
+                case "node":
+                    current_file.get_node_by_id(args.id)
+                case "node_type":
+                    current_file.get_node_type_by_name(args.id)
         case "get-node-asset-directory":
-            pass
+            current_file.get_node_asset_directory(args.id)
         case "open-node-asset-directory":
-            pass
+            current_file.open_node_asset_directory(args.id)
         case "upload-node-asset":
-            pass
+            current_file.upload_node_asset(args.id, args.asset)
         case "match-node":
-            pass
+            current_file.match_nodes_by_url(args.url)
         case "set-node":
-            pass
+            current_file.set_node_by_id(
+                args.id, args.url, args.type, args.content
+            )
         case "set-node-content":
+            # Should open default editor (vi, notepad.exe, etc.) and then
+            # change content with current_file.set_node_by_id(content=content)
             pass
         case "update-node-type":
-            pass
+            current_file.update_node_type(
+                args.current_name, args.name, args.scheme, args.scheme_font
+            )
         case "set-node-type-scheme":
+            # Should open default editor (vi, notepad.exe, etc.) and then
+            # change scheme with current_file.update_node_type(scheme=scheme)
             pass
         case "set-node-type-scheme-font":
+            # Should open default editor (vi, notepad.exe, etc.) and then
+            # change scheme with current_file.update_node_type(scheme_font=scheme_font)
             pass
         case "set-edge":
-            pass
+            current_file.set_edge_by_id(
+                args.id, args.source_node_id, args.type, args.target_node_id
+            )
         case "update-edge-type":
-            pass
+            current_file.update_edge_type(args.current_name, args.name)
 
 
 def shell():
