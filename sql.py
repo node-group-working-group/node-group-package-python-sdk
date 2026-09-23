@@ -9,6 +9,7 @@ class SqliteDatabase:
 
     def __enter__(self):
         self.connection = sqlite3.connect(self.path)
+        self.connection.execute("PRAGMA foreign_keys = ON")
         self.cursor = self.connection.cursor()
         return self
 
@@ -25,3 +26,6 @@ class SqliteDatabase:
 
     def fetch_all(self):
         return self.cursor.fetchall()
+
+    def fetch_one(self):
+        return self.cursor.fetchone()

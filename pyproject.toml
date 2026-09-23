@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "node-group-package-python-sdk"
+version = "0.1.0"
+description = "Node Group Package File Python SDK"
+requires-python = ">=3.14"
+license = {text = "MIT"}
+
+[project.scripts]
+node-group-package = "shell:shell"
+
+[tool.setuptools]
+py-modules = ["constants", "file", "index", "metadata", "node", "shell", "sql"]

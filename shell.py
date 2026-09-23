@@ -1,7 +1,10 @@
 import argparse
+import os
 import shlex
+import subprocess
+import tempfile
 
-from .file import File
+from file import File
 
 current_file = File()
 parser = argparse.ArgumentParser(exit_on_error=False)
@@ -12,26 +15,22 @@ quit_parser = shell_parsers.add_parser("quit")
 
 open_parser = shell_parsers.add_parser("open")
 open_parser.add_argument("-f", "--force", action="store_true")
-open_parser.add_argument("path", type=str)
+open_parser.add_argument("path", default=None, nargs="?", type=str)
 
 commit_parser = shell_parsers.add_parser("commit")
-commit_parser.add_argument("path", default=None, type=str)
+commit_parser.add_argument("path", default=None, nargs="?", type=str)
 
 insert_node_parser = shell_parsers.add_parser("insert-node")
-insert_node_parser.add_argument("type", default="article", type=str)
+insert_node_parser.add_argument("--type", default="article", type=str)
 insert_node_parser.add_argument("url", type=str)
 
 create_node_type_parser = shell_parsers.add_parser("create-node-type")
 create_node_type_parser.add_argument("name", type=str)
 
 insert_edge_parser = shell_parsers.add_parser("insert-edge")
-insert_edge_parser.add_argument(
-    "source-node-id", dest="source_node_id", type=int
-)
+insert_edge_parser.add_argument("source-node-id", type=int)
 insert_edge_parser.add_argument("type", type=str)
-insert_edge_parser.add_argument(
-    "target-node-id", dest="target_node_id", type=int
-)
+insert_edge_parser.add_argument("target-node-id", type=int)
 
 create_edge_type_parser = shell_parsers.add_parser("create-relationship-type")
 create_edge_type_parser.add_argument("name", type=str)
@@ -46,7 +45,7 @@ get_all_parser = shell_parsers.add_parser("get-all")
 get_all_parser.add_argument(
     "entity", choices=["edge", "edge_type", "node", "node_type"], type=str
 )
-get_all_parser.add_argument("type", default=None, type=str)
+get_all_parser.add_argument("type", default=None, nargs="?", type=str)
 
 
 get_parser = shell_parsers.add_parser("get")
@@ -87,9 +86,7 @@ update_node_type_parser.add_argument("--scheme", type=str)
 update_node_type_parser.add_argument(
     "--scheme-font", dest="scheme_font", type=str
 )
-update_node_type_parser.add_argument(
-    "current-name", dest="current_name", type=str
-)
+update_node_type_parser.add_argument("current-name", type=str)
 
 set_node_type_scheme_parser = shell_parsers.add_parser("set-node-type-scheme")
 set_node_type_scheme_parser.add_argument("name", type=str)
@@ -110,10 +107,29 @@ set_edge_parser.add_argument(
 set_edge_parser.add_argument("id", type=int)
 
 update_edge_type_parser = shell_parsers.add_parser("update-edge-type")
-update_edge_type_parser.add_argument(
-    "current-name", dest="current_name", type=str
-)
-update_edge_type_parser.add_argument("new-name", dest="new_name", type=str)
+update_edge_type_parser.add_argument("current-name", type=str)
+update_edge_type_parser.add_argument("new-name", type=str)
+
+
+def open_editor(text=""):
+    editor = (
+        os.environ.get("VISUAL")
+        or os.environ.get("EDITOR")
+        or ("notepad.exe" if os.name == "nt" else "vi")
+    )
+
+    with tempfile.NamedTemporaryFile(
+        mode="w", suffix=".txt", delete=False
+    ) as handle:
+        handle.write(text or "")
+        path = handle.name
+
+    try:
+        subprocess.call([editor, path])
+        with open(path, "r") as handle:
+            return handle.read()
+    finally:
+        os.unlink(path)
 
 
 def execute(command):
@@ -128,7 +144,7 @@ def execute(command):
 
     try:
         args = parser.parse_args(args_list)
-    except (argparse.ArgumentError, SystemExit):
+    except argparse.ArgumentError, SystemExit:
         return
 
     match args.command:
@@ -163,7 +179,8 @@ def execute(command):
                 case "edge_type":
                     current_file.get_all_edge_types()
                 case "node":
-                    current_file.get_all_nodes(args.type)
+                    for node in current_file.get_all_nodes(args.type):
+                        print(str(node))
                 case "node_type":
                     current_file.get_all_node_types()
         case "get":
@@ -189,21 +206,24 @@ def execute(command):
                 args.id, args.url, args.type, args.content
             )
         case "set-node-content":
-            # Should open default editor (vi, notepad.exe, etc.) and then
-            # change content with current_file.set_node_by_id(content=content)
-            pass
+            node = current_file.get_node_by_id(args.id)
+            initial = node.content if node else ""
+            content = open_editor(initial or "")
+            current_file.set_node_by_id(args.id, content=content)
         case "update-node-type":
             current_file.update_node_type(
                 args.current_name, args.name, args.scheme, args.scheme_font
             )
         case "set-node-type-scheme":
-            # Should open default editor (vi, notepad.exe, etc.) and then
-            # change scheme with current_file.update_node_type(scheme=scheme)
-            pass
+            node_type = current_file.get_node_type_by_name(args.name)
+            initial = node_type.scheme if node_type else ""
+            scheme = open_editor(initial or "")
+            current_file.update_node_type(args.name, scheme=scheme)
         case "set-node-type-scheme-font":
-            # Should open default editor (vi, notepad.exe, etc.) and then
-            # change scheme with current_file.update_node_type(scheme_font=scheme_font)
-            pass
+            node_type = current_file.get_node_type_by_name(args.name)
+            initial = node_type.scheme_font if node_type else ""
+            scheme_font = open_editor(initial or "")
+            current_file.update_node_type(args.name, scheme_font=scheme_font)
         case "set-edge":
             current_file.set_edge_by_id(
                 args.id, args.source_node_id, args.type, args.target_node_id
@@ -225,3 +245,5 @@ def shell():
             break
         except EOFError:
             break
+        except Exception as exception:
+            print(exception)
