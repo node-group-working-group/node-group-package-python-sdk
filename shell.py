@@ -46,7 +46,7 @@ get_all_parser = shell_parsers.add_parser("get-all")
 get_all_parser.add_argument(
     "entity", choices=["edge", "edge_type", "node", "node_type"], type=str
 )
-get_all_parser.add_argument("type", type=str)
+get_all_parser.add_argument("type", default=None, type=str)
 
 
 get_parser = shell_parsers.add_parser("get")
@@ -67,7 +67,7 @@ open_node_asset_directory_parser.add_argument("id", type=int)
 
 upload_node_asset_parser = shell_parsers.add_parser("upload-node-asset")
 upload_node_asset_parser.add_argument("id", type=int)
-upload_node_asset_parser.add_argument("asset", type=int)
+upload_node_asset_parser.add_argument("asset", type=str)
 
 match_node_parser = shell_parsers.add_parser("match-node")
 match_node_parser.add_argument("match", type=str)
